@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <script type="module" src="/static/firebase-login.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      padding: 30px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    form, .board {
+      margin-bottom: 20px;
+    }
+    .board-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    .board {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 5px 0;
+    }
+    .owner-badge {
+      font-size: 0.8em;
+      color: #888;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome, {{ user_token.email }}</h1>
+
+    <form method="post" action="/create-board">
+      <input type="text" name="board_name" placeholder="Enter new board name" required />
+      <button type="submit">Create Board</button>
+    </form>
+
+    <div class="board-list">
+      {% for board in boards %}
+      <div class="board">
+        <h3>{{ board.name }}</h3>
+        <div class="owner-badge">
+          {% if board.creator == user_token.user_id %}
+            (Owner)
+          {% else %}
+            (Shared)
+          {% endif %}
+        </div>
+        <a href="/board/{{ board.id }}">
+          <button>Open</button>
+        </a>
+        {% if board.creator == user_token.user_id %}
+        <form method="post" action="/board/{{ board.id }}/delete">
+          <button style="background:#dc2626;">Delete</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <br />
+    <button id="signout-btn" style="background:#ef4444;">Sign Out</button>
+  </div>
+</body>
+</html>

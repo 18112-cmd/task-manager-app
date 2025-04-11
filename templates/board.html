@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ board.name }}</title>
+  <script type="module" src="/static/firebase-login.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9fafb;
+      padding: 20px;
+    }
+    .header, form {
+      margin-bottom: 20px;
+    }
+    .task-list {
+      margin-top: 20px;
+    }
+    .task {
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+    .task.completed {
+      background: #d1fae5;
+      text-decoration: line-through;
+    }
+    .task.unassigned {
+      border-left: 4px solid red;
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 5px 0;
+    }
+    .summary {
+      background: #f3f4f6;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Board: {{ board.name }}</h2>
+    {% if board.creator == user_token.user_id %}
+    <form method="post" action="/board/{{ board.id }}/rename">
+      <input type="text" name="new_name" placeholder="Rename board..." required />
+      <button type="submit">Rename</button>
+    </form>
+    {% endif %}
+  </div>
+
+  {% set total = tasks | length %}
+  {% set completed = tasks | selectattr('completed') | list | length %}
+  {% set active = total - completed %}
+
+  <div class="summary">
+    <strong>Task Summary:</strong>
+    Total: {{ total }} |
+    Active: {{ active }} |
+    Completed: {{ completed }}
+  </div>
+
+  <form method="post" action="/add-task/{{ board.id }}">
+    <input type="text" name="title" placeholder="Task title" required />
+    <input type="date" name="due_date" required />
+    <input type="text" name="assigned_to" placeholder="Assign to UID (optional)" />
+    <button type="submit">Add Task</button>
+  </form>
+
+  <form method="post" action="/board/{{ board.id }}/add-user">
+    <input type="text" name="user_uid" placeholder="UID to share board" required />
+    <button type="submit">Add User</button>
+  </form>
+
+  {% if board.creator == user_token.user_id %}
+  <form method="post" action="/board/{{ board.id }}/remove-user">
+    <input type="text" name="user_uid" placeholder="UID to remove from board" required />
+    <button type="submit" style="background:#f97316;">Remove User</button>
+  </form>
+  {% endif %}
+
+  <div class="task-list">
+    {% for task in tasks %}
+    <div class="task {% if task.completed %}completed{% endif %} {% if task.unassigned %}unassigned{% endif %}">
+      <form method="post" action="/complete-task/{{ board.id }}/{{ task.id }}">
+        <strong>{{ task.title }}</strong><br />
+        Due: {{ task.due_date }}<br />
+        Assigned to: {{ task.assigned_to or "None" }}<br />
+        {% if not task.completed %}
+        <button type="submit">Mark Complete</button>
+        {% else %}
+        ✅ Completed at: {{ task.completed_at }}
+        {% endif %}
+      </form>
+
+      <form method="post" action="/board/{{ board.id }}/edit-task/{{ task.id }}">
+        <input type="text" name="title" value="{{ task.title }}" required />
+        <input type="date" name="due_date" value="{{ task.due_date }}" required />
+        <input type="text" name="assigned_to" value="{{ task.assigned_to or '' }}" />
+        <button type="submit">Update</button>
+      </form>
+
+      <form method="post" action="/board/{{ board.id }}/delete-task/{{ task.id }}">
+        <button type="submit" style="background:#ef4444;">Delete</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if board.creator == user_token.user_id %}
+  <form method="post" action="/board/{{ board.id }}/delete">
+    <button type="submit" style="background:#dc2626;">Delete Board (only if empty)</button>
+  </form>
+  {% endif %}
+
+  <br /><br />
+  <button id="signout-btn" style="background:#ef4444;">Sign Out</button>
+</body>
+</html>

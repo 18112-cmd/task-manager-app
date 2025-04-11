@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Task Manager</title>
+  <script type="module" src="/static/firebase-login.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    input, button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Task Manager Login</h2>
+    <div id="login-box" style="display:none;">
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button id="login-btn">Login</button>
+      <button id="signup-btn">Sign Up</button>
+    </div>
+    <button id="signout-btn" style="display:none;">Sign Out</button>
+  </div>
+</body>
+</html>
