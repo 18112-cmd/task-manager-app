@@ -1,7 +1,9 @@
+# firestore_service.py
 import firebase_admin
 from firebase_admin import credentials, auth
 from google.cloud import firestore
 from google.oauth2 import service_account
+
 
 # Load Firebase service account credentials
 SERVICE_ACCOUNT_FILE = "firebase-adminsdk.json"
